@@ -1,0 +1,114 @@
+<html>
+ <head><title>OpenLayers Vector Linestring Example</title></head>
+ <body>
+     
+ 
+  <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+ 	<div id="mouse-position"></div>
+Edges:<br>
+ 
+		Source Lat:   <input type="text" name="Source Lat" value=" "><br>
+		Source Lon:   <input type="text" name="Source Lon" value=" "><br>
+		Destination Lat: <input type="text" name="Destination Lat" value=" "><br>
+		Destination Lon: <input type="text" name="Destination Lon" value=" "><br>
+		<input type="submit" value="Submit">
+ 
+ 
+ <div id="edgesDiv" style="height:500px;"></div>
+<button type="button">ç</button>
+ <script>
+   var style = new OpenLayers.StyleMap({
+       'fillColor':"#FF8C00",
+       'strokeWidth':10,
+   });  
+   map = new OpenLayers.Map("edgesDiv");
+   map.addLayer(new OpenLayers.Layer.OSM());
+   
+   epsg4326 =  new OpenLayers.Projection("EPSG:4326"); //WGS 1984 projection
+   projectTo = map.getProjectionObject(); //The map projection (Spherical Mercator)
+  
+   var lonLat = new OpenLayers.LonLat($centerObservationMap ).transform(epsg4326, projectTo);
+   
+   var zoom=16;
+   map.setCenter (lonLat, zoom);
+
+   var vectorLayer = new OpenLayers.Layer.Vector("Overlay", {styleMap:style});
+   
+   var points = [ 
+   
+       #foreach($point in $edgeList)
+              new OpenLayers.Geometry.Point( $point ).transform(epsg4326, projectTo),
+       #end
+   
+   ];
+   
+   var feature = new OpenLayers.Feature.Vector(
+           new OpenLayers.Geometry.LineString(points)
+   );
+
+    markers = new OpenLayers.Layer.Markers( "Markers" );
+    markers.id = "Markers";
+	map.addLayer(markers);
+
+	map.events.register("click", map, function(e) {
+     
+    var position = map.getLonLatFromPixel(e.xy);
+    alert("Lat : "+position.lon.toFixed(5)+"  Lon  : "+position.lat.toFixed(5));
+	
+    var size = new OpenLayers.Size(21,25);
+    var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+    var icon = new OpenLayers.Icon('C:\\Users\\irem\\RoutePlanner\\images\\marker.png', size, offset);   
+    var markerslayer = map.getLayer('Markers');
+   	markerslayer.addMarker(new OpenLayers.Marker(position,icon));
+   	
+
+   });
+   vectorLayer.addFeatures(feature);
+
+   map.addLayer(vectorLayer);
+   
+   
+      var mousePositionControl = new ol.control.MousePosition({
+        coordinateFormat: ol.coordinate.createStringXY(4),
+        projection: 'EPSG:4326',
+        className: 'custom-mouse-position',
+        target: document.getElementById('mouse-position'),
+        undefinedHTML: '&nbsp;'
+      });
+
+      var map = new ol.Map({
+        controls: ol.control.defaults({
+          attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+            collapsible: false
+          })
+        }).extend([mousePositionControl]),
+        layers: [
+          new ol.layer.Tile({
+            source: new ol.source.OSM()
+          })
+        ],
+        target: 'map',
+        view: new ol.View({
+          center: [0, 0],
+          zoom: 2
+        })
+      });
+
+      var projectionSelect = document.getElementById('projection');
+      projectionSelect.addEventListener('change', function(event) {
+        mousePositionControl.setProjection(ol.proj.get(event.target.value));
+      });
+
+      var precisionInput = document.getElementById('precision');
+      precisionInput.addEventListener('change', function(event) {
+        var format = ol.coordinate.createStringXY(event.target.valueAsNumber);
+        mousePositionControl.setCoordinateFormat(format);
+      });
+   
+   
+ </script>
+ 
+ 
+
+</body>
+</html>
