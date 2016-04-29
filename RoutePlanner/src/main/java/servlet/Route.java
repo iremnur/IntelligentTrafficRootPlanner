@@ -29,8 +29,6 @@ public class Route extends HttpServlet {
 	public static String sourcePoint;
 	public static String destinationPoint;
 	public static NodeUCS result;
-
-	
 	public static double sourceLat;
 	public static double sourceLon;
 	public static double destinationLat;
@@ -67,22 +65,22 @@ public class Route extends HttpServlet {
 			// returns map
 			GeneralParser.mapCreator(null);
 
-			if (request.getParameter("sourceLat") != null) {
-				sourceLat = new Double( request.getParameter("sourceLat"));
-			}
-			if (request.getParameter("sourceLon") != null) {
-				sourceLon = new Double(request.getParameter("sourceLon"));
-			}
-			if (request.getParameter("destinationLat") != null) {
-				destinationLat =new Double( request.getParameter("destinationLat"));
-			}
-			if (request.getParameter("destinationLon") != null) {
-				destinationLon = new Double(request.getParameter("destinationLon"));
-			}
 		
 			
+			if (request.getParameter("src") != null) {
+				String[] array = request.getParameter("src").split(",");
+				sourceLon = Double.parseDouble(array[0]);
+				sourceLat =  Double.parseDouble(array[1]);
+				//sourceLon = new Double(request.getParameter("src"));
+			}
+			if (request.getParameter("dst") != null) {
+				String[] array = request.getParameter("dst").split(",");
+				destinationLon = Double.parseDouble(array[0]);
+				destinationLat =  Double.parseDouble(array[1]);
+			}
 			
-
+			
+			
 			Node closestSource = null;
 			Node closestDestination= null;
 			double minDistance = Integer.MAX_VALUE;
@@ -114,7 +112,7 @@ public class Route extends HttpServlet {
 
 			// baþlangýç noktasý olarak verebiliriz yada lat long arasýndaki
 			// farký alabiliriz.
-
+			//virgülden sonraki 6. basamaðý yuvarlýyor.
 			String centerObservationMap = (Float.toString(result.getNode()
 					.getLon()) + "," + Float
 					.toString(result.getNode().getLat()));
@@ -132,6 +130,7 @@ public class Route extends HttpServlet {
 						+ "," + Float.toString(result.getNode().getLat()));
 				
 				result = result.getParent();
+				System.out.println("deneme");
 			}
 		
 			
@@ -139,7 +138,7 @@ public class Route extends HttpServlet {
 			// get UI
 			RequestDispatcher requestDispatcher = request
 					.getRequestDispatcher("edges.vm");
-
+	
 			request.setAttribute("edgeList", edgeCoordinates);
 			request.setAttribute("centerObservationMap", centerObservationMap);
 			requestDispatcher.forward(request, response);

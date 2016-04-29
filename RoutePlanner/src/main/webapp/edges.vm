@@ -1,21 +1,54 @@
 <html>
- <head><title>OpenLayers Vector Linestring Example</title></head>
+ <head>
+ <title>OpenLayers Vector Linestring Example</title>
+  
+ 
+    
+ 
+ </head>
  <body>
+     
+  <iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.izmirtoplutasimarehberi.com%2F&amp;send=false&amp;layout=button_count&amp;width=450&amp;show_faces=true&amp;font&amp;colorscheme=light&amp;action=like&amp;height=21&amp;appId=469104659832433" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:170px; height:21px;position:absolute;right:0px;z-index:1000;top:5px;" allowTransparency="true"></iframe>
      
  
   <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
- 	<div id="mouse-position"></div>
+  <div id="mouse-position"></div>
+ 	
+ 	  <select class="lang">
+    <option value="Türkçe">Türkçe</option>
+    <option value="English">English</option>
+  </select>
+  <br>
 Edges:<br>
- 
-		Source Lat:   <input type="text" name="Source Lat" value=" "><br>
-		Source Lon:   <input type="text" name="Source Lon" value=" "><br>
-		Destination Lat: <input type="text" name="Destination Lat" value=" "><br>
-		Destination Lon: <input type="text" name="Destination Lon" value=" "><br>
-		<input type="submit" value="Submit">
- 
- 
+
+<div class="left-wrapper">
+<form action="http://localhost:8080/RoutePlanner/Route">
+    <div class="top-box">
+      <div class="top-wrapper">
+        <div class="start">
+           <input placeholder="Baþlangýç adresi girin" lang="tr" type="text" name="src" id="src"/>
+           <button class="geo btn" onclick="getLocation()"><img src="images/geo.png" style="width:18px;height:18px">
+           </img></button>
+        </div>
+        <div class="end">
+           <input placeholder="Varýþ adresi girin" lang="tr" type="text" name="dst" id="dst"/>
+           <button class="swap btn" onclick="swap()"><img src="images/swap.png" style="width:19px;height:19px"></img></button>
+           </div>
+       
+        <input type="submit" lang="tr" id="btn" class="snd btn btn-success" 
+        
+        value="Yol Tarifi Al">
+        </input>
+      </div>
+    </div>
+</form>
+</div>
+
  <div id="edgesDiv" style="height:500px;"></div>
-<button type="button">ç</button>
+ 
+ 
+
+
  <script>
    var style = new OpenLayers.StyleMap({
        'fillColor':"#FF8C00",
@@ -53,16 +86,25 @@ Edges:<br>
 	map.events.register("click", map, function(e) {
      
     var position = map.getLonLatFromPixel(e.xy);
-    alert("Lat : "+position.lon.toFixed(5)+"  Lon  : "+position.lat.toFixed(5));
+    var x = new OpenLayers.LonLat(position.lon, position.lat).transform('EPSG:3857', 'EPSG:4326');
+    alert("Lat : "+x.lon.toFixed(5)+"  Lon  : "+x.lat.toFixed(5));
+    if(document.getElementById("src").value=="")
+    {
+		document.getElementById("src").value = x.lon.toFixed(5)+","+x.lat.toFixed(5);
+	}else{
+		document.getElementById("dst").value = x.lon.toFixed(5) +","+x.lat.toFixed(5);
+	}
 	
     var size = new OpenLayers.Size(21,25);
     var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
-    var icon = new OpenLayers.Icon('C:\\Users\\irem\\RoutePlanner\\images\\marker.png', size, offset);   
+    var icon = new OpenLayers.Icon('images/marker.png', size, offset);   
     var markerslayer = map.getLayer('Markers');
    	markerslayer.addMarker(new OpenLayers.Marker(position,icon));
    	
 
    });
+    
+   
    vectorLayer.addFeatures(feature);
 
    map.addLayer(vectorLayer);
@@ -106,9 +148,51 @@ Edges:<br>
       });
    
    
+   
+ function swap(){
+ 
+	var srcpre = document.getElementById("src").value;
+	document.getElementById("src").value = document.getElementById("dst").value;
+	document.getElementById("dst").value = srcpre;
+	
+}	
+
+
+
+function getDirections(){
+//
+}
+
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+       
+    } else { 
+        x.innerHTML = "Geolocation is not supported by this browser.";
+    }
+}
+
+function showPosition(position) {
+ 	document.getElementById("src").value=position.coords.longitude+","+position.coords.latitude;
+ 	
+}
+
+var markerArray = [];
+
+function putMarker(position,icon,title){
+
+    var markers = new OpenLayers.Layer.Markers( "Markers" );
+   	markers.id = "Markers";
+	map.addLayer(markers);
+    markerArray.push(markers);
+}
+   
  </script>
  
  
 
+  
+  
 </body>
 </html>

@@ -1,7 +1,9 @@
 package servlet;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 public class Algorithm {
 
@@ -22,6 +24,7 @@ public class Algorithm {
 	}
 
 	public static NodeUCS UCS(Node s, Node g) {
+		HashSet<Node> visited = new HashSet<Node>();
 
 		NodeComparatorUCS nodeComparator = new NodeComparatorUCS();
 		/* 2000 is the capacity, */
@@ -36,28 +39,34 @@ public class Algorithm {
 		expandList.add(startPoint);
 
 		while (expandList.size() > 0) {
+
 			NodeUCS toBeExpanded = expandList.remove();
+
 			if (toBeExpanded.getNode().equals(g)) {
 				return toBeExpanded;
 			}
-			List<Node> neighbors = toBeExpanded.getNode().getList();
-			// neighbors, toBeExpanded'ýn bütün komþularý.
+			if (!visited.contains(toBeExpanded.getNode())) {
+				visited.add(toBeExpanded.getNode());
+	
 
-			for (Node neighbor : neighbors) {
+				List<Node> neighbors = toBeExpanded.getNode().getList();
+				// neighbors, toBeExpanded'ýn bütün komþularý.
 
-				NodeUCS neighbors1 = new NodeUCS();
-				neighbors1.setParent(toBeExpanded);
-				neighbors1.setNode(neighbor);
-				neighbors1.setCost(toBeExpanded.getCost()
-						+ (int) calculateDistance(toBeExpanded.getNode()
-								.getLat(), toBeExpanded.getNode().getLon(),
-								neighbors1.getNode().getLat(), neighbors1
-										.getNode().getLon()));
+				for (Node neighbor : neighbors){
 
-				expandList.add(neighbors1);
+					NodeUCS neighbors1 = new NodeUCS();
+					neighbors1.setParent(toBeExpanded);
+					neighbors1.setNode(neighbor);
+					neighbors1.setCost(toBeExpanded.getCost()
+							+ (int) calculateDistance(toBeExpanded.getNode()
+									.getLat(), toBeExpanded.getNode().getLon(),
+									neighbors1.getNode().getLat(), neighbors1
+											.getNode().getLon()));
 
+					expandList.add(neighbors1);
+
+				}
 			}
-
 		}
 		return null;
 	}
